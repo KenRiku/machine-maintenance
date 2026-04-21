@@ -1,0 +1,131 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Organization {
+  id         String   @id @default(cuid())
+  name       String
+  createdAt  DateTime @default(now())
+  users      User[]
+  machines   Machine[]
+  partOrders PartOrder[]
+}
+
+model User {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  name         String
+  passwordHash String
+  role         String   @default("MANAGER")
+  orgId        String
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  createdAt    DateTime @default(now())
+  workOrders   WorkOrder[]
+  serviceLogs  ServiceLog[]
+  chatMessages ChatMessage[]
+}
+
+model Machine {
+  id            String   @id @default(cuid())
+  orgId         String
+  organization  Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  name          String
+  type          String
+  model         String
+  manufacturer  String
+  serialNumber  String
+  location      String
+  status        String   @default("OPERATIONAL")
+  notes         String?
+  createdAt     DateTime @default(now())
+  schedules     MaintenanceSchedule[]
+  workOrders    WorkOrder[]
+  serviceLogs   ServiceLog[]
+  chatMessages  ChatMessage[]
+}
+
+model MaintenanceSchedule {
+  id            String   @id @default(cuid())
+  machineId     String
+  machine       Machine  @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  title         String
+  description   String
+  intervalDays  Int
+  nextDueDate   DateTime
+  status        String   @default("ACTIVE")
+  createdAt     DateTime @default(now())
+  workOrders    WorkOrder[]
+}
+
+model WorkOrder {
+  id            String   @id @default(cuid())
+  machineId     String
+  machine       Machine  @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  scheduleId    String?
+  schedule      MaintenanceSchedule? @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
+  type          String   // PM | REPAIR | FAILURE
+  title         String
+  description   String?
+  status        String   @default("OPEN") // OPEN | IN_PROGRESS | COMPLETED
+  assignedToId  String?
+  assignedTo    User?    @relation(fields: [assignedToId], references: [id], onDelete: SetNull)
+  dueDate       DateTime?
+  createdAt     DateTime @default(now())
+  completedAt   DateTime?
+  completionNotes String?
+  partsUsed     String?
+  serviceLogs   ServiceLog[]
+}
+
+model ServiceLog {
+  id            String   @id @default(cuid())
+  workOrderId   String?
+  workOrder     WorkOrder? @relation(fields: [workOrderId], references: [id], onDelete: Cascade)
+  machineId     String
+  machine       Machine  @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  technicianId  String?
+  technician    User?    @relation(fields: [technicianId], references: [id], onDelete: SetNull)
+  type          String   // PM | REPAIR | FAILURE | NOTE
+  notes         String
+  partsUsed     String?
+  createdAt     DateTime @default(now())
+}
+
+model Part {
+  id                 String   @id @default(cuid())
+  name               String
+  sku                String   @unique
+  description        String
+  price              Float
+  category           String
+  compatibleTypes    String[] // array of machine types
+  imageUrl           String?
+  stock              Int      @default(100)
+  createdAt          DateTime @default(now())
+}
+
+model PartOrder {
+  id         String   @id @default(cuid())
+  orgId      String
+  organization Organization @relation(fields: [orgId], references: [id], onDelete: Cascade)
+  machineId  String?
+  totalPrice Float
+  itemsJson  String   // json array [{partId, qty, price, name}]
+  status     String   @default("SIMULATED") // SIMULATED
+  createdAt  DateTime @default(now())
+}
+
+model ChatMessage {
+  id         String   @id @default(cuid())
+  machineId  String
+  machine    Machine  @relation(fields: [machineId], references: [id], onDelete: Cascade)
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role       String   // user | assistant
+  content    String
+  createdAt  DateTime @default(now())
+}

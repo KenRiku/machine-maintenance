@@ -1,0 +1,172 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-display: "Space Mono", "IBM Plex Mono", ui-monospace, monospace;
+  --font-sans: "Inter Tight", "Inter", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", "Fira Code", ui-monospace, monospace;
+}
+
+html,
+body {
+  background: #07090C;
+  color: #D6DAE1;
+  min-height: 100vh;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background-image:
+    radial-gradient(
+      1200px 600px at 90% -10%,
+      rgba(244, 125, 29, 0.08),
+      transparent 60%
+    ),
+    radial-gradient(
+      800px 500px at -10% 110%,
+      rgba(56, 189, 248, 0.05),
+      transparent 60%
+    ),
+    linear-gradient(180deg, #07090C 0%, #0B0E13 100%);
+  background-attachment: fixed;
+}
+
+@layer components {
+  .hairline {
+    @apply border border-white/5;
+  }
+  .panel {
+    @apply bg-ink-900/80 backdrop-blur-sm border border-white/5 rounded-none;
+  }
+  .panel-inset {
+    @apply bg-ink-800/70 border border-white/5 rounded-none;
+  }
+  .btn {
+    @apply inline-flex items-center gap-2 px-4 py-2 text-sm uppercase tracking-[0.15em]
+           border border-white/10 bg-white/[0.02] hover:bg-white/[0.05]
+           text-ink-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed
+           focus:outline-none focus:ring-1 focus:ring-rust-400/40;
+  }
+  .btn-primary {
+    @apply btn bg-rust-500 hover:bg-rust-400 text-black border-rust-500/80 font-medium;
+  }
+  .btn-ghost {
+    @apply btn border-transparent hover:border-white/10;
+  }
+  .input, .textarea, .select {
+    @apply w-full bg-ink-950/60 border border-white/10 px-3 py-2 text-ink-100
+           placeholder:text-ink-300/60 focus:outline-none focus:border-rust-400/60
+           focus:ring-1 focus:ring-rust-400/30 rounded-none;
+  }
+  .label {
+    @apply block text-[11px] uppercase tracking-[0.2em] text-ink-300 mb-1.5;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.15em] px-2 py-0.5 border;
+  }
+  .chip-op {
+    @apply chip text-signal-green border-signal-green/30 bg-signal-green/5;
+  }
+  .chip-warn {
+    @apply chip text-signal-amber border-signal-amber/30 bg-signal-amber/5;
+  }
+  .chip-down {
+    @apply chip text-signal-red border-signal-red/30 bg-signal-red/5;
+  }
+  .chip-info {
+    @apply chip text-signal-blue border-signal-blue/30 bg-signal-blue/5;
+  }
+  .chip-mute {
+    @apply chip text-ink-200 border-white/10 bg-white/[0.02];
+  }
+  .kpi {
+    @apply panel p-5 relative overflow-hidden;
+  }
+  .kpi::before {
+    content: "";
+    @apply absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent;
+  }
+  .display-type {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+  .mono {
+    font-family: var(--font-mono);
+  }
+  .tick-bar {
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0.08) 0 1px,
+      transparent 1px 8px
+    );
+  }
+  .grain::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.03;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='120' height='120' filter='url(%23n)' opacity='0.6'/></svg>");
+    mix-blend-mode: overlay;
+  }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #07090C;
+}
+::-webkit-scrollbar-thumb {
+  background: #232B36;
+  border: 2px solid #07090C;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #323C4A;
+}
+
+/* Table */
+.data-table {
+  @apply w-full text-sm;
+}
+.data-table thead th {
+  @apply text-[10px] uppercase tracking-[0.2em] text-ink-300 font-normal text-left px-4 py-3 border-b border-white/5 bg-white/[0.02];
+}
+.data-table tbody td {
+  @apply px-4 py-3 border-b border-white/[0.04] align-middle;
+}
+.data-table tbody tr:hover {
+  @apply bg-white/[0.02];
+}
+
+/* Fade-in on load */
+@keyframes slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.rise {
+  animation: slide-up 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes pulse-line {
+  0%,
+  100% {
+    opacity: 0.25;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+.pulse-line {
+  animation: pulse-line 2.4s ease-in-out infinite;
+}
